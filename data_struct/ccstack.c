@@ -1,64 +1,53 @@
 #include "ccstack.h"
-
 #include "common.h"
-
-
-void printStack(CC_STACK *Stack)
-{
-	int i;
-	printf("\nTOP ->: ");
-	for (i = StGetCount(Stack) - 1 ; i >= 0; i--)
-	{ 
-   
-		printf("\n| ");
-		printf("%d ", Stack->StackPtr[i]);
-		printf(" |");
-	}
-
-	printf(" \n");
-}
 
 int StCreate(CC_STACK **Stack)
 {
+	CC_STACK* stack = NULL;
+
 	
-	if (Stack == NULL)
-	{
-		return -1;
-	}
-	(*Stack) = (CC_STACK *)malloc(sizeof(CC_STACK));
-	if (*Stack == NULL)
+	if (NULL == Stack)
 	{
 		return -1;
 	}
 
+	stack = (CC_STACK*)malloc(sizeof(CC_STACK));
 
-	(*Stack)->Size = 0;
-	(*Stack)->Capacity = 100;
-	(*Stack)->StackPtr = (int*)malloc (sizeof(int)*(*Stack) ->Capacity );
+	if (NULL == stack)
+	{
+		return -1;
+	}
+
+	memset(stack, 0, sizeof(*stack));
+
+	stack->Top = (NODE*)malloc(sizeof(NODE));
+	if (NULL == stack->Top)
+	{
+		free(stack);
+		return -1;
+	}
+	stack->Top->Link = NULL;
+	stack->Count = 0;
+	stack->Top->Data = -1;
+	*Stack = stack;
 	
-	return 0;
+    return 0;
 }
 
 int StDestroy(CC_STACK **Stack)
 {
-	if (Stack == NULL)
+	CC_STACK* stack = *Stack;
+
+	if (NULL == Stack)
 	{
 		return -1;
 	}
+	
+	free(stack->Top);
+	free(stack);
 
-
-	if (*Stack == NULL)
-	{
-		return -1;
-	}	
-	(*Stack)->Capacity = 0;
-	(*Stack)->Size = 0;
-	if ((*Stack)->StackPtr != NULL)
-	{
-		free((*Stack)->StackPtr);
-		free(*Stack);
-	}
-	return 0; 
+	*Stack = NULL;
+    return 0;
 }
 
 int StPush(CC_STACK *Stack, int Value)
@@ -66,18 +55,21 @@ int StPush(CC_STACK *Stack, int Value)
 	if (NULL == Stack)
 	{
 		return -1;
-	}
-	if (Stack->Size >= Stack->Capacity) {
-		Stack->Capacity *= 2;
-		Stack->StackPtr = realloc(Stack->StackPtr, sizeof(int)*Stack->Capacity);
-		if (Stack->StackPtr == NULL)
-			return -1;
+    }
+	NODE* newNode = NULL;
+	newNode = (NODE*)malloc(sizeof(NODE));
 
+	if (NULL == newNode)
+	{
+		return -1;
 	}
-	Stack->StackPtr[Stack->Size++] = Value;
-	return 0;
+	newNode->Data = Value;
+	newNode->Link = Stack->Top;
+	Stack->Top = newNode;
+	Stack->Count++;
+
+    return 0;
 }
-	
 
 int StPop(CC_STACK *Stack, int *Value)
 {
@@ -85,14 +77,27 @@ int StPop(CC_STACK *Stack, int *Value)
 	{
 		return -1;
 	}
-	*Value = Stack->StackPtr[Stack->Size -1 ];
-	Stack->Size--;
-	if (0 == Stack->Size)
+	if ((NULL == Stack->Top )|| (NULL == Value))
 	{
-		Stack->StackPtr = NULL;
+		return -1;
 	}
-	
-    return 0;
+	if (0 == Stack->Count)
+	{
+		return -1;
+	}
+	NODE* newNode = NULL;
+	newNode = (NODE*)malloc(sizeof(NODE));
+	//save top node into a temporary node
+	newNode = Stack->Top;
+	//assign second node to top 
+	Stack->Top = Stack->Top->Link;
+	Stack->Count--;
+	//destory the connection(pointer) between first and second
+	newNode->Link = NULL;
+	*Value = newNode->Data;
+	free(newNode);
+
+    return  0;
 }
 
 int StPeek(CC_STACK *Stack, int *Value)
@@ -101,10 +106,17 @@ int StPeek(CC_STACK *Stack, int *Value)
 	{
 		return -1;
 	}
-	*Value = Stack->StackPtr[Stack->Size - 1];
+	if (NULL == Stack->Top)
+	{
+		return -1;
+	}
+	if (0 == Stack->Count)
+	{
+		return -1;
+	}
+	*Value = Stack->Top->Data;
     return 0;
 }
-
 
 int StIsEmpty(CC_STACK *Stack)
 {
@@ -112,23 +124,17 @@ int StIsEmpty(CC_STACK *Stack)
 	{
 		return -1;
 	}
-	if (0 != Stack->Size)
-	{
-		return 0;
-	}
-	else
-
-    return 1;
+    return 0 == Stack->Count;
 }
 
 int StGetCount(CC_STACK *Stack)
-{  
+{
 	if (NULL == Stack)
 	{
 		return -1;
-	}
-    
-    return Stack->Size;
+   }
+
+    return Stack->Count;
 }
 
 int StClear(CC_STACK *Stack)
@@ -137,21 +143,35 @@ int StClear(CC_STACK *Stack)
 	{
 		return -1;
 	}
-	Stack->Size = 0;
-	Stack->StackPtr = realloc(Stack->StackPtr, sizeof(int)*Stack->Capacity);
 
+	while (Stack-> Count != 0)
+	{
+		int temp = 0;
+		StPop(Stack, &temp);
+	}
     return 0;
 }
 
+
 int StPushStack(CC_STACK *Stack, CC_STACK *StackToPush)
-{ 
+{
 	if ((NULL == Stack) || (NULL == StackToPush))
 	{
 		return -1;
 	}
-	int i; 
-	for (i = 0; i < StackToPush->Size; i++)
-		StPush(Stack, StackToPush->StackPtr[i]);
-	StClear(StackToPush);
+	
+
+	NODE* newNode = NULL;
+	newNode = (NODE*)malloc(sizeof(NODE));
+	newNode = StackToPush->Top;
+
+	while (newNode->Link->Link != NULL)
+	{
+		newNode = newNode->Link;
+		
+	}
+	newNode->Link = Stack->Top;
+	StackToPush->Count += Stack->Count  ;
+	
 	return 0;
 }

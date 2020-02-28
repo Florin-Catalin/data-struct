@@ -3,47 +3,151 @@
 #include "ccvector.h"
 #include "ccstack.h"
 #include "cchashtable.h"
-
 #include "ccheap.h"
-
 #include "cctree.h"
 
 int TestVector();
 int TestStack();
-
 int TestHashTable();
-
 int TestHeap();
-
 int TestTree();
-
-
 
 void RunTests();
 
+/**
+@parameter
+@return 
+*/
+void toString(CC_VECTOR* Vector)
+{
+	if (NULL == Vector)
+	{
+		printf("NULL");
+	}
+	else
+	{
+		printf("\n ");
+		printf("Vector capacity is : %d\n", Vector->Size);
+		printf("The number of elements in the vector is : %d\n", VecGetCount(Vector));
+		printf("The array is : ");
+
+		int i;
+		printf("\n[");
+		for (i = 0; i < Vector->Count; i++)
+		{
+			printf("%d ", Vector->Array[i]);
+		}
+		printf("]\n");
+		printf("\n ");
+	}
+}
+
+void stackToString(CC_STACK* Stack)
+{
+	
+	if (NULL == Stack)
+	{
+		printf("NULL");
+	}
+	else if (NULL == Stack->Top)
+	{
+		printf("NULL");
+	}
+	else 
+	{
+		NODE* ptr = NULL;
+		ptr = (NODE*)malloc(sizeof(NODE));
+		ptr = Stack->Top;
+
+		while (ptr->Link != NULL)
+		{
+			printf("%d -> ", ptr->Data);
+			ptr = ptr->Link;
+			
+		}
+	}
+	printf("\n");
+}
+
+
+
 int main(void)
 {
+	//vector test 
+	/*
+	CC_VECTOR* usedVector = NULL;
+     VecCreate(&usedVector);
+	 toString(usedVector);
+	 VecInsertTail(usedVector, 2);
+	 toString(usedVector);
+	 VecInsertTail(usedVector, 2);
+	 VecInsertTail(usedVector, 2);
+	 toString(usedVector);
+	 VecInsertAfterIndex(usedVector, 1 , 0);
+	 toString(usedVector);
+	 VecRemoveByIndex(usedVector, 2);
+	 toString(usedVector);
+	 VecClear(usedVector);
+	 toString(usedVector);
+	 VecInsertTail(usedVector, 2);
+	 VecInsertTail(usedVector, 21);
+	 VecInsertTail(usedVector, 32);
+	 VecInsertTail(usedVector, 112);
+	 VecInsertTail(usedVector, 4122);
+	 VecInsertTail(usedVector, 12312);
+	 VecInsertTail(usedVector, 32132);
+	 VecInsertTail(usedVector, 322);
+	 toString(usedVector);
+	 VecSort(usedVector);
+	 toString(usedVector);
 
-   RunTests();
+	 CC_VECTOR* anotherVector = NULL;
+	 VecCreate(& anotherVector);
+	 VecInsertTail(anotherVector, 1111111111);
+	 VecInsertTail(anotherVector, 333333333);
+	 toString(anotherVector);
+	 VecAppend(anotherVector, usedVector);
+	 toString(anotherVector);
+	*/
+
+	//stack test
+	//int temp = 0;
+	CC_STACK* usedStack = NULL  ;
+	StCreate(&usedStack);
+	StPush(usedStack, 1);
+	StPush(usedStack, 2);
+	StPush(usedStack, 3);
+	stackToString(usedStack);
+	
+	CC_STACK* anotherStack = NULL;
+	StCreate(&anotherStack);
+	StPush(anotherStack, 1);
+	StPush(anotherStack, 4);
+	StPush(anotherStack, 5);
+	stackToString(anotherStack);
+	stackToString(anotherStack);
+	StPushStack(usedStack, anotherStack);
+	stackToString(anotherStack);
+	stackToString(usedStack);
+	stackToString(anotherStack);
+	//StClear(usedStack);
+   // RunTests();
     return 0;
 }
 
 void RunTests()
 {
-    /// NOTE: The tests provided here are by no means exhaustive and are only
-    /// provided as a starting point (not all functions are tested, not all use cases
-    /// and failure scenarios are covered). You are encouraged to expand these tests
-    /// to include missing scenarios.
+   
     if (0 == TestVector())
     {
         printf("Vector test passed\n\n");
     }
-	
     else
     {
         printf("Vector test failed\n\n");
     }
-	
+	/*
+
     if (0 == TestStack())
     {
         printf("Stack test passed\n\n");
@@ -52,7 +156,7 @@ void RunTests()
     {
         printf("Stack test failed\n\n");
     }
-	
+
     if (0 == TestHashTable())
     {
         printf("HashTable test passed\n\n");
@@ -61,7 +165,7 @@ void RunTests()
     {
         printf("HashTable test failed\n\n");
     }
-	
+
     if (0 == TestHeap())
     {
         printf("Heap test passed\n\n");
@@ -71,7 +175,6 @@ void RunTests()
         printf("Heap test failed\n\n");
     }
 
-	
     if (0 == TestTree())
     {
         printf("Tree test passed\n\n");
@@ -80,10 +183,10 @@ void RunTests()
     {
         printf("Tree test failed\n\n");
     }
-	
+	*/
 }
 
-
+/*
 int TestTree()
 {
     int retVal = -1;
@@ -142,7 +245,7 @@ cleanup:
     }
     return retVal;
 }
-            
+              
 int TestHeap()
 {
     int retVal = -1;
@@ -203,7 +306,6 @@ cleanup:
     return retVal;
 }
 
-
 int TestHashTable()
 {
     int retVal = -1;
@@ -214,90 +316,89 @@ int TestHashTable()
     if (0 != retVal)
     {
         printf("HtCreate failed!\n");
-        //goto cleanup;
+        goto cleanup;
     }
-	retVal = HtSetKeyValue(usedTable, "mere", 20);
-	if (0 != retVal)
-	{
-		printf("HtSetKeyValue failed!\n");
-		//goto cleanup;
-	}
-	if (0 != HtHasKey(usedTable, "mere"))
-	{
-		printf("Invalid answer to HtHasKey!\n");
-		retVal = -1;
-		//goto cleanup;
-	}
-	retVal = HtGetKeyValue(usedTable, "mere", &foundVal);
-	if (0 != retVal)
-	{
-		printf("HtGetKeyValue failed!\n");
-		//goto cleanup;
-	}
-	if (foundVal != 20)
-	{
-		printf("Invalid value after get!\n");
-		retVal = -1;
-		goto cleanup;
-	}
+
+    retVal = HtSetKeyValue(usedTable, "mere", 20);
+    if (0 != retVal)
+    {
+        printf("HtSetKeyValue failed!\n");
+        goto cleanup;
+    }
+
+    if (1 != HtHasKey(usedTable, "mere"))
+    {
+        printf("Invalid answer to HtHasKey!\n");
+        retVal = -1;
+        goto cleanup;
+    }
+
+    retVal = HtGetKeyValue(usedTable, "mere", &foundVal);
+    if (0 != retVal)
+    {
+        printf("HtGetKeyValue failed!\n");
+        goto cleanup;
+    }
+
+    if (foundVal != 20)
+    {
+        printf("Invalid value after get!\n");
+        retVal = -1;
+        goto cleanup;
+    }
 
 cleanup:
-	if (NULL != usedTable)
-	{
-		if (0 != HtDestroy(&usedTable))
-		{
-			printf("HtDestroy failed!\n");
-			retVal = -1;
-		}
-	}
+    if (NULL != usedTable)
+    {
+        if (0 != HtDestroy(&usedTable))
+        {
+            printf("HtDestroy failed!\n");
+            retVal = -1;
+        }
+    }
     return retVal;
 }
 
-
 int TestStack()
 {
-	int retVal = -1;
-	int foundVal = -1;
-	CC_STACK* usedStack = NULL;
+    int retVal = -1;
+    int foundVal = -1;
+    CC_STACK* usedStack = NULL;
 
-	retVal = StCreate(&usedStack);
-	if (0 != retVal)
-	{
-		printf("StCreate failed!\n");
-		goto cleanup;
-	}
+    retVal = StCreate(&usedStack);
+    if (0 != retVal)
+    {
+        printf("StCreate failed!\n");
+        goto cleanup;
+    }
 
-	retVal = StPush(usedStack, 10);
-	if (0 != retVal)
-	{
-		printf("StPush failed!\n");
-		goto cleanup;
-	}
-	
-	if (0 != StIsEmpty(usedStack))
-	{
-		printf("Invalid answer to StIsEmpty!\n");
-		retVal = -1;
-		goto cleanup;
-	}
-	
-	retVal = StPop(usedStack, &foundVal);
-	if (0 != retVal)
-	{
-		printf("StPop failed!\n");
-		goto cleanup;
-	}
-	
+    retVal = StPush(usedStack, 10);
+    if (0 != retVal)
+    {
+        printf("StPush failed!\n");
+        goto cleanup;
+    }
 
+    if (1 != StIsEmpty(usedStack))
+    {
+        printf("Invalid answer to StIsEmpty!\n");
+        retVal = -1;
+        goto cleanup;
+    }
 
+    retVal = StPop(usedStack, &foundVal);
+    if (0 != retVal)
+    {
+        printf("StPop failed!\n");
+        goto cleanup;
+    }
 
-	if (foundVal != 10)
-	{
-		printf("Invalid value after pop!\n");
-		retVal = -1;
-		goto cleanup;
-	}
-	
+    if (foundVal != 10)
+    {
+        printf("Invalid value after pop!\n");
+        retVal = -1;
+        goto cleanup;
+    }
 
 cleanup:
     if (NULL != usedStack)
@@ -310,14 +411,13 @@ cleanup:
     }
     return retVal;
 }
-
-
+*/
 int TestVector()
 {
     int retVal = -1;
     int foundVal = 0;
     CC_VECTOR* usedVector = NULL;
-    
+ 
     retVal = VecCreate(&usedVector);
     if (0 != retVal)
     {
